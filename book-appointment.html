@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Appointment</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Date picker library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto p-4 max-w-4xl" x-data="bookingSystem()">
+        <h1 class="text-3xl font-bold text-center my-6 text-indigo-700">Book Your Appointment</h1>
+
+        <!-- Progress Steps -->
+        <div class="flex justify-between mb-8">
+            <template x-for="(step, index) in steps" :key="index">
+                <div class="flex flex-col items-center">
+                    <div
+                        class="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                        :class="currentStep > index ? 'bg-indigo-600 text-white' : currentStep === index ? 'bg-indigo-500 text-white' : 'bg-gray-300 text-gray-700'"
+                    >
+                        <span x-text="index + 1"></span>
+                    </div>
+                    <span class="text-sm mt-2" x-text="step"></span>
+                </div>
+            </template>
+        </div>
+
+        <!-- Step Content -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Step 1: Service Selection -->
+            <div x-show="currentStep === 0" class="space-y-4">
+                <h2 class="text-2xl font-semibold mb-4">Select a Service</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <template x-for="service in services" :key="service.id">
+                        <div
+                            class="border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md"
+                            :class="selectedService && selectedService.id === service.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'"
+                            @click="selectService(service)"
+                        >
+                            <h3 class="font-bold text-lg" x-text="service.name"></h3>
+                            <p class="text-gray-600" x-text="service.description"></p>
+                            <div class="flex justify-between mt-2">
+                                <span class="font-semibold text-indigo-700" x-text="`$${service.price}`"></span>
+                                <span class="text-gray-500" x-text="`${service.duration} min`"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button
+                        @click="nextStep"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                        :disabled="!selectedService"
+                        :class="{'opacity-50 cursor-not-allowed': !selectedService}"
+                    >
+                        Continue
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Date and Time Selection -->
+            <div x-show="currentStep === 1" class="space-y-4">
+                <h2 class="text-2xl font-semibold mb-4">Select Date & Time</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Date</label>
+                        <input
+                            type="text"
+                            x-ref="datePicker"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Select date"
+                        >
+                    </div>
+                    <div x-show="selectedDate">
+                        <label class="block text-gray-700 mb-2">Available Time Slots</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <template x-for="slot in availableTimeSlots" :key="slot">
+                                <button
+                                    class="border rounded-md py-2 transition-colors"
+                                    :class="selectedTime === slot ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-300 hover:border-indigo-500'"
+                                    @click="selectedTime = slot"
+                                    x-text="slot"
+                                ></button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button
+                        @click="prevStep"
+                        class="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                        Back
+                    </button>
+                    <button
+                        @click="nextStep"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                        :disabled="!selectedDate || !selectedTime"
+                        :class="{'opacity-50 cursor-not-allowed': !selectedDate || !selectedTime}"
+                    >
+                        Continue
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Personal Information -->
+            <div x-show="currentStep === 2" class="space-y-4">
+                <h2 class="text-2xl font-semibold mb-4">Your Information</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">First Name</label>
+                        <input
+                            type="text"
+                            x-model="personalInfo.firstName"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="First Name"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Last Name</label>
+                        <input
+                            type="text"
+                            x-model="personalInfo.lastName"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Last Name"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Email</label>
+                        <input
+                            type="email"
+                            x-model="personalInfo.email"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Email Address"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Phone</label>
+                        <input
+                            type="tel"
+                            x-model="personalInfo.phone"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Phone Number"
+                        >
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 mb-2">Notes (Optional)</label>
+                        <textarea
+                            x-model="personalInfo.notes"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Any special requests or information?"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button
+                        @click="prevStep"
+                        class="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                        Back
+                    </button>
+                    <button
+                        @click="nextStep"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                        :disabled="!isPersonalInfoValid"
+                        :class="{'opacity-50 cursor-not-allowed': !isPersonalInfoValid}"
+                    >
+                        Continue
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Payment Information -->
+            <div x-show="currentStep === 3" class="space-y-4">
+                <h2 class="text-2xl font-semibold mb-4">Payment Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Card Number</label>
+                        <input
+                            type="text"
+                            x-model="paymentInfo.cardNumber"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Card Number"
+                        >
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Expiry Date</label>
+                            <input
+                                type="text"
+                                x-model="paymentInfo.expiryDate"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2"
+                                placeholder="MM/YY"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">CVC</label>
+                            <input
+                                type="text"
+                                x-model="paymentInfo.cvc"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2"
+                                placeholder="CVC"
+                            >
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Name on Card</label>
+                        <input
+                            type="text"
+                            x-model="paymentInfo.nameOnCard"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2"
+                            placeholder="Name on Card"
+                        >
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button
+                        @click="prevStep"
+                        class="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                        Back
+                    </button>
+                    <button
+                        @click="nextStep"
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                        :disabled="!isPaymentInfoValid"
+                        :class="{'opacity-50 cursor-not-allowed': !isPaymentInfoValid}"
+                    >
+                        Review Booking
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 5: Review & Confirm -->
+            <div x-show="currentStep === 4" class="space-y-4">
+                <h2 class="text-2xl font-semibold mb-4">Review & Confirm</h2>
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <h3 class="font-semibold text-lg mb-2">Appointment Details</h3>
+                    <div class="grid md:grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-gray-600">Service:</span>
+                            <span class="font-medium" x-text="selectedService.name"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Price:</span>
+                            <span class="font-medium" x-text="`$${selectedService.price}`"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Date:</span>
+                            <span class="font-medium" x-text="selectedDate"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Time:</span>
+                            <span class="font-medium" x-text="selectedTime"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <h3 class="font-semibold text-lg mb-2">Personal Information</h3>
+                    <div class="grid md:grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-gray-600">Name:</span>
+                            <span class="font-medium" x-text="`${personalInfo.firstName} ${personalInfo.lastName}`"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Email:</span>
+                            <span class="font-medium" x-text="personalInfo.email"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Phone:</span>
+                            <span class="font-medium" x-text="personalInfo.phone"></span>
+                        </div>
+                    </div>
+                    <div x-show="personalInfo.notes" class="mt-2">
+                        <span class="text-gray-600">Notes:</span>
+                        <p class="font-medium" x-text="personalInfo.notes"></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <h3 class="font-semibold text-lg mb-2">Payment</h3>
+                    <div>
+                        <span class="text-gray-600">Card:</span>
+                        <span class="font-medium" x-text="`**** **** **** ${paymentInfo.cardNumber.slice(-4)}`"></span>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between">
+                    <button
+                        @click="prevStep"
+                        class="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                        Back
+                    </button>
+                    <button
+                        @click="confirmBooking"
+                        class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                    >
+                        Book It!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 6: Confirmation -->
+            <div x-show="currentStep === 5" class="text-center py-8">
+                <svg class="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <h2 class="text-2xl font-bold text-gray-800 mt-4">Booking Confirmed!</h2>
+                <p class="text-gray-600 mt-2">Your appointment has been scheduled successfully.</p>
+                <div class="mt-4 bg-gray-50 p-4 rounded-md inline-block text-left">
+                    <p><span class="font-semibold">Date:</span> <span x-text="selectedDate"></span></p>
+                    <p><span class="font-semibold">Time:</span> <span x-text="selectedTime"></span></p>
+                    <p><span class="font-semibold">Service:</span> <span x-text="selectedService.name"></span></p>
+                </div>
+                <p class="mt-4 text-gray-600">A confirmation email has been sent to <span class="font-semibold" x-text="personalInfo.email"></span></p>
+                <button
+                    @click="resetBooking"
+                    class="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                >
+                    Book Another Appointment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function bookingSystem() {
+            return {
+                steps: ['Service', 'Date & Time', 'Your Details', 'Payment', 'Review'],
+                currentStep: 0,
+                services: [
+                    { id: 1, name: 'Haircut', description: 'Professional haircut with styling', price: 45, duration: 30 },
+                    { id: 2, name: 'Beard Trim', description: 'Grooming and shaping your beard', price: 25, duration: 15 },
+                    { id: 3, name: 'Hair Color', description: 'Full hair coloring service', price: 85, duration: 90 },
+                    { id: 4, name: 'Style & Blowdry', description: 'Hair styling with blowdry', price: 35, duration: 45 }
+                ],
+                selectedService: null,
+                selectedDate: null,
+                selectedTime: null,
+                availableTimeSlots: ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'],
+                personalInfo: {
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phone: '',
+                    notes: ''
+                },
+                paymentInfo: {
+                    cardNumber: '',
+                    expiryDate: '',
+                    cvc: '',
+                    nameOnCard: ''
+                },
+
+                init() {
+                    this.$nextTick(() => {
+                        this.initDatePicker();
+                    });
+                },
+
+                initDatePicker() {
+                    const fpInstance = flatpickr(this.$refs.datePicker, {
+                        minDate: "today",
+                        dateFormat: "Y-m-d",
+                        disable: [
+                            function(date) {
+                                // Disable weekends (0 is Sunday, 6 is Saturday)
+                                return date.getDay() === 0;
+                            }
+                        ],
+                        onChange: (selectedDates, dateStr) => {
+                            this.selectedDate = dateStr;
+                            // In a real app, you might fetch available time slots for this date
+                        }
+                    });
+                },
+
+                selectService(service) {
+                    this.selectedService = service;
+                },
+
+                nextStep() {
+                    if (this.currentStep < this.steps.length) {
+                        this.currentStep++;
+                    }
+                },
+
+                prevStep() {
+                    if (this.currentStep > 0) {
+                        this.currentStep--;
+                    }
+                },
+
+                get isPersonalInfoValid() {
+                    return this.personalInfo.firstName.trim() !== '' &&
+                           this.personalInfo.lastName.trim() !== '' &&
+                           this.personalInfo.email.trim() !== '' &&
+                           this.personalInfo.phone.trim() !== '';
+                },
+
+                get isPaymentInfoValid() {
+                    return this.paymentInfo.cardNumber.trim() !== '' &&
+                           this.paymentInfo.expiryDate.trim() !== '' &&
+                           this.paymentInfo.cvc.trim() !== '' &&
+                           this.paymentInfo.nameOnCard.trim() !== '';
+                },
+
+                async confirmBooking() {
+                    // In a real app, you would send this data to your backend
+                    try {
+                        // Simulate API call
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        const bookingData = {
+                            service: this.selectedService,
+                            date: this.selectedDate,
+                            time: this.selectedTime,
+                            client: this.personalInfo,
+                            payment: {
+                                lastFour: this.paymentInfo.cardNumber.slice(-4)
+                            }
+                        };
+
+                        console.log('Booking submitted:', bookingData);
+
+                        // Show confirmation
+                        this.currentStep = 5;
+                    } catch (error) {
+                        console.error('Error submitting booking:', error);
+                        alert('There was an error processing your booking. Please try again.');
+                    }
+                },
+
+                resetBooking() {
+                    this.currentStep = 0;
+                    this.selectedService = null;
+                    this.selectedDate = null;
+                    this.selectedTime = null;
+                    this.personalInfo = {
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        phone: '',
+                        notes: ''
+                    };
+                    this.paymentInfo = {
+                        cardNumber: '',
+                        expiryDate: '',
+                        cvc: '',
+                        nameOnCard: ''
+                    };
+                }
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Sign Up - Appointment Scheduler</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Custom Styles -->
+    <style>
+        .hero-gradient {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div x-data="{
+        mobileMenuOpen: false,
+        currentStep: 1,
+        totalSteps: 4,
+        formData: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            username: '',
+            password: '',
+            confirmPassword: '',
+            companyName: '',
+            role: '',
+            industry: '',
+            newsletter: false,
+            termsAgreed: false
+        },
+        errors: {}
+    }">
+        <!-- Navigation Bar -->
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <!-- Logo -->
+                            <span class="text-2xl font-bold text-indigo-600">Scheduler</span>
+                        </div>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-8">
+                        <a href="index.html" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="login.html" class="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium">Sign In</a>
+                    </div>
+                    <div class="-mr-2 flex items-center sm:hidden">
+                        <!-- Mobile menu button -->
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="sr-only">Open main menu</span>
+                            <!-- Icon when menu is closed -->
+                            <svg x-show="!mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            <!-- Icon when menu is open -->
+                            <svg x-show="mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div x-show="mobileMenuOpen" class="sm:hidden" id="mobile-menu">
+                <div class="pt-2 pb-3 space-y-1">
+                    <a href="index.html" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">Home</a>
+                    <a href="login.html" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">Sign In</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-indigo-600 px-4 py-5 sm:px-6">
+                        <h1 class="text-2xl font-bold text-white">Customer Sign Up</h1>
+                        <p class="mt-1 text-sm text-indigo-100">Create your account to start scheduling appointments</p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="px-4 py-4 sm:px-6">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                            <div class="bg-indigo-600 h-2.5 rounded-full" :style="`width: ${(currentStep/totalSteps)*100}%`"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span :class="currentStep >= 1 ? 'text-indigo-600 font-medium' : ''">Basic Info</span>
+                            <span :class="currentStep >= 2 ? 'text-indigo-600 font-medium' : ''">Account</span>
+                            <span :class="currentStep >= 3 ? 'text-indigo-600 font-medium' : ''">Business</span>
+                            <span :class="currentStep >= 4 ? 'text-indigo-600 font-medium' : ''">Preferences</span>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="px-4 py-5 sm:p-6">
+                        <form @submit.prevent="submitForm">
+                            <!-- Step 1: Basic Information -->
+                            <div x-show="currentStep === 1">
+                                <h2 class="text-lg font-medium text-gray-900 mb-5">Basic Information</h2>
+
+                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                    <!-- First Name -->
+                                    <div class="sm:col-span-3">
+                                        <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                                        <div class="mt-1">
+                                            <input type="text" id="firstName" x-model="formData.firstName" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                        </div>
+                                        <p x-show="errors.firstName" x-text="errors.firstName" class="mt-2 text-sm text-red-600"></p>
+                                    </div>
+
+                                    <!-- Last Name -->
+                                    <div class="sm:col-span-3">
+                                        <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                                        <div class="mt-1">
+                                            <input type="text" id="lastName" x-model="formData.lastName" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                        </div>
+                                        <p x-show="errors.lastName" x-text="errors.lastName" class="mt-2 text-sm text-red-600"></p>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="sm:col-span-6">
+                                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                        <div class="mt-1">
+                                            <input type="email" id="email" x-model="formData.email" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                        </div>
+                                        <p x-show="errors.email" x-text="errors.email" class="mt-2 text-sm text-red-600"></p>
+                                        <p class="mt-2 text-sm text-gray-500">We'll never share your email with anyone else.</p>
+                                    </div>
+
+                                    <!-- Phone Number -->
+                                    <div class="sm:col-span-6">
+                                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
+                                        <div class="mt-1">
+                                            <input type="tel" id="phone" x-model="formData.phone" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                        </div>
+                                        <p x-show="errors.phone" x-text="errors.phone" class="mt-2 text-sm text-red-600"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Account Details -->
+                            <div x-show="currentStep === 2">
+                                <h2 class="text-lg font-medium text-gray-900 mb-5">Account Details</h2>
+
+                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                    <!-- Username -->
+                                    <div class="sm:col-span-6">
+                                        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                                        <div class="mt-1">
+                                            <input type="text" id="username" x-model="formData.username" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                        </div>
+                                        <p x-show="errors.username" x-text="errors.username" class="mt-2 text-sm text-red-600"></p>
+                                        <p class="mt-2 text-sm text-gray-500">Your unique identifier for logging in</p>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="sm:col-span-6">
+                                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                                        <div class="mt-1">
+                                            <input type="password" id="password" x-model="formData.password" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                        </div>
+                                        <p x-show="errors.password" x-text="errors.password" class="mt-2 text-sm text-red-600"></p>
+                                        <p class="mt-2 text-sm text-gray-500">Must be at least 8 characters with at least one uppercase letter, one lowercase letter, one number, and one special character</p>
+                                    </div>
+
+                                    <!-- Confirm Password -->
+                                    <div class="sm:col-span-6">
+                                        <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                                        <div class="mt-1">
+                                            <input type="password" id="confirmPassword" x-model="formData.confirmPassword" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" required>
+                                        </div>
+                                        <p x-show="errors.confirmPassword" x-text="errors.confirmPassword" class="mt-2 text-sm text-red-600"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Business Information -->
+                            <div x-show="currentStep === 3">
+                                <h2 class="text-lg font-medium text-gray-900 mb-5">Business Information (Optional)</h2>
+
+                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                    <!-- Company Name -->
+                                    <div class="sm:col-span-6">
+                                        <label for="companyName" class="block text-sm font-medium text-gray-700">Company Name</label>
+                                        <div class="mt-1">
+                                            <input type="text" id="companyName" x-model="formData.companyName" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                        </div>
+                                    </div>
+
+                                    <!-- Role/Position -->
+                                    <div class="sm:col-span-3">
+                                        <label for="role" class="block text-sm font-medium text-gray-700">Role/Position</label>
+                                        <div class="mt-1">
+                                            <input type="text" id="role" x-model="formData.role" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                        </div>
+                                    </div>
+
+                                    <!-- Industry Type -->
+                                    <div class="sm:col-span-3">
+                                        <label for="industry" class="block text-sm font-medium text-gray-700">Industry</label>
+                                        <div class="mt-1">
+                                            <select id="industry" x-model="formData.industry" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                                <option value="">Select Industry</option>
+                                                <option value="healthcare">Healthcare</option>
+                                                <option value="education">Education</option>
+                                                <option value="technology">Technology</option>
+                                                <option value="finance">Finance</option>
+                                                <option value="retail">Retail</option>
+                                                <option value="hospitality">Hospitality</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: Preferences and Permissions -->
+                            <div x-show="currentStep === 4">
+                                <h2 class="text-lg font-medium text-gray-900 mb-5">Preferences and Permissions</h2>
+
+                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                    <!-- Communication Preferences -->
+                                    <div class="sm:col-span-6">
+                                        <div class="flex items-start">
+                                            <div class="flex items-center h-5">
+                                                <input id="newsletter" type="checkbox" x-model="formData.newsletter" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                            </div>
+                                            <div class="ml-3 text-sm">
+                                                <label for="newsletter" class="font-medium text-gray-700">Receive newsletters and updates</label>
+                                                <p class="text-gray-500">We'll keep you informed about new features and promotions.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Terms and Conditions -->
+                                    <div class="sm:col-span-6">
+                                        <div class="flex items-start">
+                                            <div class="flex items-center h-5">
+                                                <input id="terms" type="checkbox" x-model="formData.termsAgreed" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" required>
+                                            </div>
+                                            <div class="ml-3 text-sm">
+                                                <label for="terms" class="font-medium text-gray-700">I agree to the terms and conditions</label>
+                                                <p class="text-gray-500">
+                                                    By checking this box, you agree to our
+                                                    <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a> and
+                                                    <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a>.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <p x-show="errors.termsAgreed" x-text="errors.termsAgreed" class="mt-2 text-sm text-red-600"></p>
+                                    </div>
+
+                                    <!-- Captcha -->
+                                    <div class="sm:col-span-6">
+                                        <div class="p-4 bg-gray-100 rounded-md flex items-center justify-center">
+                                            <p class="text-sm text-gray-500">Captcha verification would appear here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="mt-8 flex justify-between">
+                                <button
+                                    type="button"
+                                    x-show="currentStep > 1"
+                                    @click="currentStep--"
+                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Back
+                                </button>
+                                <div x-show="currentStep === 1"></div> <!-- Empty div for alignment on first step -->
+
+                                <button
+                                    type="button"
+                                    x-show="currentStep < totalSteps"
+                                    @click="validateStep()"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Next
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    x-show="currentStep === totalSteps"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Create Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Already have an account link -->
+                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                        <p class="text-sm text-gray-500">
+                            Already have an account?
+                            <a href="login.html" class="font-medium text-indigo-600 hover:text-indigo-500">Sign in</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('form', () => ({
+                validateStep() {
+                    this.errors = {};
+                    let valid = true;
+
+                    // Step 1 validation
+                    if (this.currentStep === 1) {
+                        if (!this.formData.firstName) {
+                            this.errors.firstName = 'First name is required';
+                            valid = false;
+                        }
+                        if (!this.formData.lastName) {
+                            this.errors.lastName = 'Last name is required';
+                            valid = false;
+                        }
+                        if (!this.formData.email) {
+                            this.errors.email = 'Email is required';
+                            valid = false;
+                        } else if (!/^\S+@\S+\.\S+$/.test(this.formData.email)) {
+                            this.errors.email = 'Please enter a valid email address';
+                            valid = false;
+                        }
+                        if (this.formData.phone && !/^\+?[0-9\s\-\(\)]+$/.test(this.formData.phone)) {
+                            this.errors.phone = 'Please enter a valid phone number';
+                            valid = false;
+                        }
+                    }
+
+                    // Step 2 validation
+                    if (this.currentStep === 2) {
+                        if (!this.formData.username) {
+                            this.errors.username = 'Username is required';
+                            valid = false;
+                        }
+                        if (!this.formData.password) {
+                            this.errors.password = 'Password is required';
+                            valid = false;
+                        } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(this.formData.password)) {
+                            this.errors.password = 'Password must meet the requirements';
+                            valid = false;
+                        }
+                        if (!this.formData.confirmPassword) {
+                            this.errors.confirmPassword = 'Please confirm your password';
+                            valid = false;
+                        } else if (this.formData.password !== this.formData.confirmPassword) {
+                            this.errors.confirmPassword = 'Passwords do not match';
+                            valid = false;
+                        }
+                    }
+
+                    // If valid, proceed to next step
+                    if (valid) {
+                        this.currentStep++;
+                    }
+                },
+
+                submitForm() {
+                    // Final validation for terms agreement
+                    this.errors = {};
+                    if (!this.formData.termsAgreed) {
+                        this.errors.termsAgreed = 'You must agree to the terms and conditions';
+                        return;
+                    }
+
+                    // Here you would typically submit the form data to your backend
+                    console.log('Form submitted:', this.formData);
+
+                    // Simulate submission success and redirect
+                    alert('Account created successfully! Redirecting to login...');
+                    window.location.href = 'login.html';
+                }
+            }))
+        })
+    </script>
+</body>
+</html>

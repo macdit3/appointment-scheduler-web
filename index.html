@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppointEase - Simple Scheduling for Small Businesses</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-sm" x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <!-- Logo -->
+                        <span class="text-blue-600 text-xl font-bold">AppointEase</span>
+                    </div>
+                    <!-- Desktop Navigation Links -->
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Home
+                        </a>
+                        <a href="#features" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Features
+                        </a>
+                        <a href="#how-it-works" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            How It Works
+                        </a>
+                        <a href="#pricing" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Pricing
+                        </a>
+                    </div>
+                </div>
+                <!-- Login/Signup Buttons -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+                    <a href="login.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                        Login
+                    </a>
+                    <a href="signup.html" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium">
+                        Sign Up
+                    </a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <!-- Icon when menu is closed -->
+                        <svg x-show="!mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <!-- Icon when menu is open -->
+                        <svg x-show="mobileMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state -->
+        <div x-show="mobileMenuOpen" class="sm:hidden" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#" class="bg-blue-50 border-blue-500 text-blue-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Home</a>
+                <a href="#features" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Features</a>
+                <a href="#how-it-works" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">How It Works</a>
+                <a href="#pricing" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Pricing</a>
+                <div class="pt-4 pb-3 border-t border-gray-200">
+                    <a href="login.html" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800">Login</a>
+                    <a href="signup.html" class="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-700">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-white">
+        <div class="max-w-7xl mx-auto pt-16 pb-24 px-4 sm:pt-24 sm:pb-32 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">Appointments made simple</h1>
+                <p class="mt-6 max-w-2xl mx-auto text-xl text-gray-500">
+                    The easiest way for small businesses to schedule appointments, manage clients, and grow their business.
+                </p>
+                <div class="mt-10 flex justify-center gap-4 flex-col sm:flex-row sm:gap-6">
+                    <a href="business-dashboard.html" class="rounded-md px-8 py-3 bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        For Business Owners
+                    </a>
+                    <a href="book-appointment.html" class="rounded-md px-8 py-3 bg-white text-blue-600 font-medium border border-blue-300 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Book an Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-blue-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-gray-900">Everything you need to manage appointments</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+                    A complete toolkit for small business owners to simplify scheduling.
+                </p>
+            </div>
+
+            <div class="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-calendar-check text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Online Booking</h3>
+                    <p class="mt-4 text-gray-500">
+                        Let clients book appointments online 24/7, reducing phone calls and saving time.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-bell text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Automated Reminders</h3>
+                    <p class="mt-4 text-gray-500">
+                        Reduce no-shows with automatic email and text reminders before appointments.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-mobile-alt text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Mobile Friendly</h3>
+                    <p class="mt-4 text-gray-500">
+                        Manage your business on the go with our fully responsive mobile interface.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-user-friends text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Client Management</h3>
+                    <p class="mt-4 text-gray-500">
+                        Keep track of client information, booking history, and preferences.
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-calendar-alt text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Availability Control</h3>
+                    <p class="mt-4 text-gray-500">
+                        Set your working hours, breaks, and time off to maintain an accurate schedule.
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-chart-line text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Business Insights</h3>
+                    <p class="mt-4 text-gray-500">
+                        Gain valuable insights into your business performance with simple analytics.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-gray-900">How AppointEase Works</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+                    Three simple steps to transform your scheduling process.
+                </p>
+            </div>
+
+            <div class="mt-16">
+                <div class="lg:grid lg:grid-cols-3 lg:gap-8">
+                    <!-- Step 1 -->
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-20 w-20 rounded-full bg-blue-100 text-blue-600 mx-auto mb-4">
+                            <span class="text-2xl font-bold">1</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">Set Up Your Business</h3>
+                        <p class="mt-4 text-gray-500">
+                            Create your profile, add services, and define your availability in minutes.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="mt-10 lg:mt-0 text-center">
+                        <div class="flex items-center justify-center h-20 w-20 rounded-full bg-blue-100 text-blue-600 mx-auto mb-4">
+                            <span class="text-2xl font-bold">2</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">Share Your Booking Page</h3>
+                        <p class="mt-4 text-gray-500">
+                            Share your unique booking link with clients through email, website, or social media.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="mt-10 lg:mt-0 text-center">
+                        <div class="flex items-center justify-center h-20 w-20 rounded-full bg-blue-100 text-blue-600 mx-auto mb-4">
+                            <span class="text-2xl font-bold">3</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">Clients Book Appointments</h3>
+                        <p class="mt-4 text-gray-500">
+                            Clients can view your availability and book appointments that work for them.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-gray-900">Simple, Transparent Pricing</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+                    Choose the plan that fits your business needs.
+                </p>
+            </div>
+
+            <div class="mt-16 grid gap-8 lg:grid-cols-3">
+                <!-- Basic Plan -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Basic</h3>
+                        <p class="mt-4 text-gray-500">Perfect for individuals just starting out.</p>
+                        <p class="mt-8">
+                            <span class="text-4xl font-extrabold text-gray-900">$9</span>
+                            <span class="text-base font-medium text-gray-500">/month</span>
+                        </p>
+                        <ul class="mt-6 space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Up to 50 appointments per month</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Email reminders</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Basic client management</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4">
+                        <a href="#" class="block w-full text-center py-2 px-4 border border-blue-600 rounded-md text-blue-600 font-medium hover:bg-blue-50">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden ring-2 ring-blue-600">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Professional</h3>
+                        <p class="mt-4 text-gray-500">For growing businesses with more clients.</p>
+                        <p class="mt-8">
+                            <span class="text-4xl font-extrabold text-gray-900">$19</span>
+                            <span class="text-base font-medium text-gray-500">/month</span>
+                        </p>
+                        <ul class="mt-6 space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Unlimited appointments</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Email & SMS reminders</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Advanced client management</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Business analytics</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4">
+                        <a href="#" class="block w-full text-center py-2 px-4 bg-blue-600 rounded-md text-white font-medium hover:bg-blue-700">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Premium Plan -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold text-gray-900">Premium</h3>
+                        <p class="mt-4 text-gray-500">For established businesses with multiple staff.</p>
+                        <p class="mt-8">
+                            <span class="text-4xl font-extrabold text-gray-900">$39</span>
+                            <span class="text-base font-medium text-gray-500">/month</span>
+                        </p>
+                        <ul class="mt-6 space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Everything in Professional</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Multiple staff members</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Online payments</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-500">Custom branding</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 px-6 py-4">
+                        <a href="#" class="block w-full text-center py-2 px-4 border border-blue-600 rounded-md text-blue-600 font-medium hover:bg-blue-50">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-gray-900">What Our Customers Say</h2>
+            </div>
+
+            <div class="mt-16 grid gap-8 lg:grid-cols-3">
+                <!-- Testimonial 1 -->
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <div class="text-yellow-400 flex mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "AppointEase has transformed how I run my barber shop. No more missed appointments or scheduling conflicts. My clients love being able to book online."
+                    </p>
+                    <div class="mt-6 flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold">
+                                JD
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-gray-900">James Davis</h4>
+                            <p class="text-sm text-gray-500">Classic Cuts Barbershop</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <div class="text-yellow-400 flex mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "I was spending hours each week managing appointments for my tutoring business. AppointEase automated everything, saving me time and reducing no-shows."
+                    </p>
+                    <div class="mt-6 flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold">
+                                SR
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-gray-900">Sarah Robinson</h4>
+                            <p class="text-sm text-gray-500">Excel Tutoring</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <div class="text-yellow-400 flex mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "As a massage therapist, I need to focus on my clients, not administrative work. This app makes scheduling so easy, and the reminders have cut my no-shows in half!"
+                    </p>
+                    <div class="mt-6 flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold">
+                                MC
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="text-sm font-medium text-gray-900">Maria Chen</h4>
+                            <p class="text-sm text-gray-500">Harmony Massage Therapy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-blue-600">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+            <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                <span class="block">Ready to streamline your scheduling?</span>
+                <span class="block text-blue-200">Start your free 14-day trial today.</span>
+            </h2>
+            <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+                <div class="inline-flex rounded-md shadow">
+                    <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50">
+                        Get started
+                    </a>
+                </div>
+                <div class="ml-3 inline-flex rounded-md shadow">
+                    <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-800 hover:bg-blue-900">
+                        Learn more
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800">
+        <div class="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
+            <nav class="-mx-5 -my-2 flex flex-wrap justify-center">
+                <div class="px-5 py-2">
+                    <a href="#" class="text-base text-gray-400 hover:text-white">About</a>
+                </div>
+                <div class="px-5 py-2">
+                    <a href="#" class="text-base text-gray-400 hover:text-white">Features</a>
+                </div>
+                <div class="px-5 py-2">
+                    <a href="#" class="text-base text-gray-400 hover:text-white">Pricing</a>
+                </div>
+                <div class="px-5 py-2">
+                    <a href="#" class="text-base text-gray-400 hover:text-white">Contact</a>
+                </div>
+                <div class="px-5 py-2">
+                    <a href="#" class="text-base text-gray-400 hover:text-white">Privacy</a>
+                </div>
+                <div class="px-5 py-2">
+                    <a href="#" class="text-base text-gray-400 hover:text-white">Terms</a>
+                </div>
+            </nav>
+            <div class="mt-8 flex justify-center space-x-6">
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <span class="sr-only">Facebook</span>
+                    <i class="fab fa-facebook text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <span class="sr-only">Instagram</span>
+                    <i class="fab fa-instagram text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <span class="sr-only">Twitter</span>
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+            </div>
+            <p class="mt-8 text-center text-base text-gray-400">
+                &copy; 2023 AppointEase. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
