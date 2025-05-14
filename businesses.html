@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="js/business-int.js" defer></script>
+</head>
+<body class="bg-gray-50">
+<div x-data="businessApp" class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900">Business Management</h1>
+            <button @click="openAddModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>Add Business
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Search and Filter Bar -->
+        <div class="mb-6 bg-white p-4 rounded-lg shadow">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input
+                                type="text"
+                                x-model="searchQuery"
+                                @input="currentPage = 1"
+                                placeholder="Search businesses..."
+                                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10"
+                        >
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="resetFilters()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-redo mr-2"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Businesses Table -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th @click="sortBy('id')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Business ID
+                            <span x-show="sortColumn === 'id' && sortDirection === 'asc'"><i class="fas fa-sort-up ml-1"></i></span>
+                            <span x-show="sortColumn === 'id' && sortDirection === 'desc'"><i class="fas fa-sort-down ml-1"></i></span>
+                        </th>
+                        <th @click="sortBy('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Name
+                            <span x-show="sortColumn === 'name' && sortDirection === 'asc'"><i class="fas fa-sort-up ml-1"></i></span>
+                            <span x-show="sortColumn === 'name' && sortDirection === 'desc'"><i class="fas fa-sort-down ml-1"></i></span>
+                        </th>
+                        <th @click="sortBy('address')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Address
+                            <span x-show="sortColumn === 'address' && sortDirection === 'asc'"><i class="fas fa-sort-up ml-1"></i></span>
+                            <span x-show="sortColumn === 'address' && sortDirection === 'desc'"><i class="fas fa-sort-down ml-1"></i></span>
+                        </th>
+                        <th @click="sortBy('phone')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Phone Number
+                            <span x-show="sortColumn === 'phone' && sortDirection === 'asc'"><i class="fas fa-sort-up ml-1"></i></span>
+                            <span x-show="sortColumn === 'phone' && sortDirection === 'desc'"><i class="fas fa-sort-down ml-1"></i></span>
+                        </th>
+                        <th @click="sortBy('email')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Email
+                            <span x-show="sortColumn === 'email' && sortDirection === 'asc'"><i class="fas fa-sort-up ml-1"></i></span>
+                            <span x-show="sortColumn === 'email' && sortDirection === 'desc'"><i class="fas fa-sort-down ml-1"></i></span>
+                        </th>
+                        <th @click="sortBy('website')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                            Website
+                            <span x-show="sortColumn === 'website' && sortDirection === 'asc'"><i class="fas fa-sort-up ml-1"></i></span>
+                            <span x-show="sortColumn === 'website' && sortDirection === 'desc'"><i class="fas fa-sort-down ml-1"></i></span>
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <template x-for="business in paginatedBusinesses" :key="business.id">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900" x-text="business.id"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900" x-text="business.name"></div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900" x-text="business.address"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900" x-text="business.phone"></div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900" x-text="business.email"></div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900" x-text="business.website"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button @click="openViewModal(business)" class="text-blue-600 hover:text-blue-900 mr-3">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button @click="openEditModal(business)" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button @click="openDeleteModal(business)" class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+                    <tr x-show="filteredBusinesses.length === 0">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            No businesses found matching your criteria
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing
+                        <span class="font-medium" x-text="(currentPage - 1) * itemsPerPage + 1"></span>
+                        to
+                        <span class="font-medium" x-text="Math.min(currentPage * itemsPerPage, filteredBusinesses.length)"></span>
+                        of
+                        <span class="font-medium" x-text="filteredBusinesses.length"></span>
+                        results
+                    </p>
+                </div>
+                <div class="flex-1 flex justify-center sm:justify-end">
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button @click="prevPage()" :disabled="currentPage === 1" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <template x-for="page in totalPages">
+                            <button
+                                    @click="goToPage(page)"
+                                    :class="{ 'bg-blue-50 border-blue-500 text-blue-600': page === currentPage, 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== currentPage }"
+                                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                                    x-text="page">
+                            </button>
+                        </template>
+                        <button @click="nextPage()" :disabled="currentPage === totalPages" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Business Modal -->
+    <div x-show="isModalOpen" class="fixed inset-0 overflow-y-auto z-50" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div @click.outside="closeModal()" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" x-text="modalMode === 'add' ? 'Add New Business' : modalMode === 'edit' ? 'Edit Business' : 'Business Details'"></h3>
+                    <form @submit.prevent="submitForm()">
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                            <input type="text" id="name" x-model="formData.name" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'">
+                        </div>
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <input type="text" id="address" x-model="formData.address" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'">
+                        </div>
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="text" id="phone" x-model="formData.phone" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'">
+                        </div>
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" x-model="formData.email" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'">
+                        </div>
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                            <input type="text" id="website" x-model="formData.website" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'">
+                        </div>
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="timezone" class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+                            <input type="text" id="timezone" x-model="formData.timezone" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'">
+                        </div>
+                        <div class="mb-4" x-show="modalMode !== 'view'">
+                            <label for="cancellation_policy" class="block text-sm font-medium text-gray-700 mb-1">Cancellation Policy</label>
+                            <textarea id="cancellation_policy" x-model="formData.cancellation_policy" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" :readonly="modalMode === 'view'"></textarea>
+                        </div>
+
+                        <!-- View mode details -->
+                        <div x-show="modalMode === 'view'" class="space-y-3">
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Business ID:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.id"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Business Name:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.name"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Address:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.address"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Phone Number:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.phone"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Email:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.email"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Website:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.website"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Timezone:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.timezone"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Cancellation Policy:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formData.cancellation_policy"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Created At:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formatDate(formData.created_at)"></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-500">Updated At:</span>
+                                <p class="mt-1 text-sm text-gray-900" x-text="formatDate(formData.updated_at)"></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button x-show="modalMode !== 'view'" type="button" @click="submitForm()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        <span x-text="modalMode === 'add' ? 'Add Business' : 'Update Business'"></span>
+                    </button>
+                    <button type="button" @click="closeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div x-show="isDeleteModalOpen" class="fixed inset-0 overflow-y-auto z-50" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div @click.outside="closeDeleteModal()" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Delete Business</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    Are you sure you want to delete <span class="font-semibold" x-text="deleteBusinessName"></span>? This action cannot be undone.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" @click="deleteBusiness()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Delete
+                    </button>
+                    <button type="button" @click="closeDeleteModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="showToast" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform translate-y-2" class="fixed bottom-0 right-0 mb-4 mr-4 z-50">
+        <div :class="{'bg-green-500': toastType === 'success', 'bg-red-500': toastType === 'error', 'bg-blue-500': toastType === 'info'}" class="rounded-lg shadow-lg p-4 flex items-center text-white max-w-md">
+            <i :class="{'fa-check-circle': toastType === 'success', 'fa-times-circle': toastType === 'error', 'fa-info-circle': toastType === 'info'}" class="fas mr-3 text-lg"></i>
+            <p x-text="toastMessage"></p>
+            <button @click="showToast = false" class="ml-auto">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div x-show="isLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700 mb-3"></div>
+            <p class="text-gray-700">Loading...</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
