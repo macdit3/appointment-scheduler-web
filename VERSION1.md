@@ -72,14 +72,14 @@
 ### 8. Testing responsiveness: Desktop/Web browsers, Tables & Mobiles
 #### Mobile view:
 
-![images/img.png](img.png)
+![images/img.png](images/img.png)
 
 #### Tablet view:
-![images/img_1.png](img_1.png)
+![images/img_1.png](images/img_1.png)
 
 
 #### Responsiveness Testing of the Landing Page UI:
-![images/img_3.png](img_3.png)
+![images/img_3.png](images/img_3.png)
 
 
 ## 5. **What you learned about prompt engineering?:** 
